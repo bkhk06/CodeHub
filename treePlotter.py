@@ -99,3 +99,12 @@ def retrieveTree(i):
     return listOfTrees[i]
 
     # createPlot(thisTree)
+
+
+if __name__ == "__main__":
+    import treePlotter
+    myTree=treePlotter.retrieveTree(0)
+    print("\ntreePlotter.getTreeDepth:\n",treePlotter.getTreeDepth(myTree))
+    print("\ntreePlotter.getNumLeafs:\n",treePlotter.getNumLeafs(myTree))
+    print("\nmyTree:\n",myTree)
+    createPlot(myTree)
