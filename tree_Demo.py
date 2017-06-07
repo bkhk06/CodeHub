@@ -1,0 +1,126 @@
+import operator
+from math import log
+
+# calculate the data's entropy
+def calcShannonEnt(dataSet):
+    numEntries = len(dataSet)
+    labelCounts = {}
+    for featVec in dataSet:
+        currentLabel = featVec[-1]#load data's label
+        if currentLabel not in labelCounts.keys():
+            labelCounts[currentLabel] = 0
+        labelCounts[currentLabel] += 1
+    shannonEnt = 0.0
+    for key in labelCounts:
+        prob = float(labelCounts[key])/numEntries
+        shannonEnt -= prob * log(prob,2)
+    return shannonEnt
+
+# spilt the data's axis feature as value
+def spiltDataSet(dataSet, axis, value):
+    retDataSet = []
+    for featVec in dataSet:
+        if featVec[axis] == value:
+            reducedFeatVec = featVec[:axis]
+            reducedFeatVec.extend(featVec[axis+1:]) #as a simple
+            retDataSet.append(reducedFeatVec) #as a total
+    return retDataSet
+
+# choose the best feature：ID3
+def chooseBestFeatureToSplit_ID3(dataSet):
+    numFeatures = len(dataSet[0]) - 1
+    baseEntropy = calcShannonEnt(dataSet)
+    bestInfoGain = 0.0;bestFeature = -1
+    for i in range(numFeatures):
+        featList = [example[i] for example in dataSet]
+        uniqueVals = set(featList)
+        newEntropy = 0.0
+        for value in uniqueVals:
+            subDataSet = spiltDataSet(dataSet,i,value)
+            prob = len(subDataSet)/float(len(dataSet))
+            newEntropy += prob * calcShannonEnt(subDataSet)
+        infoGain = baseEntropy - newEntropy
+        if (infoGain > bestInfoGain):
+            bestInfoGain = infoGain
+            bestFeature = i
+    return bestFeature
+
+# choose the best feature：C45
+def chooseBestFeatureToSplit_C45(dataSet):
+    numFeatures = len(dataSet[0]) - 1
+    baseEntropy = calcShannonEnt(dataSet)
+    bestInfoGain = 0.0;bestFeature = -1
+    for i in range(numFeatures):
+        featList = [example[i] for example in dataSet]
+        uniqueVals = set(featList)
+        newEntropy = 0.0
+        splitInfo = 0.0
+        for value in uniqueVals:
+            subDataSet = spiltDataSet(dataSet,i,value)
+            prob = len(subDataSet)/float(len(dataSet))
+            newEntropy += prob * calcShannonEnt(subDataSet)
+            splitInfo -= prob * log(prob,2) #记录分裂信息
+        infoGain = baseEntropy - newEntropy
+        gainRatio = infoGain / splitInfo #信息增益率
+        if (gainRatio > bestInfoGain):
+            bestInfoGain = gainRatio
+            bestFeature = i
+    return bestFeature
+
+# if classList has only one feature,but cannot spilt all
+def majorityCnt(classList):
+    classCount = {}
+    for vote in classList:
+        if vote not in classCount.keys():
+            classCount[vote] = 0
+        classCount[vote] += 1
+    sortedClassCount = sorted(classCount.iteritems(),
+    key=operator.itemgetter(1),reverse=True)
+    return sortedClassCount[0][0]
+
+# create tree
+# method = 'ID3'  or  'C45'
+def createTree(dataSet,labels,method):
+    classList = [example[-1] for example in dataSet]
+    if classList.count(classList[0]) == len(classList):
+        return classList[0]
+    if len(dataSet[0]) == 1:
+        return majorityCnt(classList)
+    if method == 'ID3':
+        bestFeat = chooseBestFeatureToSplit_ID3(dataSet)
+    else:
+        bestFeat = chooseBestFeatureToSplit_C45(dataSet)
+    bestFeatLabel = labels[bestFeat]
+    myTree = {bestFeatLabel:{}}
+    del(labels[bestFeat]) #delate the 'bestFeat' label
+    featValues = [example[bestFeat] for example in dataSet]
+    uniqueVals = set(featValues)
+    for value in uniqueVals:
+        subLabels = labels[:]
+        myTree[bestFeatLabel][value] = createTree(spiltDataSet\
+        (dataSet,bestFeat,value),subLabels,method)
+    return myTree
+# define classify
+def classify(inputTree,featLabels,testVec):
+    firstStr = inputTree.keys()[0]
+    secondDict = inputTree[firstStr]
+    featIndex = featLabels.index(firstStr)
+    global classLabel
+    for key in secondDict.keys():
+        if testVec[featIndex] == key:
+            if type(secondDict[key]).__name__=='dict':
+                classLabel = classify(secondDict[key],featLabels,testVec)
+            else:
+                classLabel = secondDict[key]
+    return classLabel
+
+if __name__ == "__main__":
+    import tree_demo
+    import treePlotter_demo
+
+    fr = open('lenses.txt')
+    lenses=[inst.strip().split('\t') for inst in fr.readlines()]
+    lensesLabels=['age','prescript','astigmatic','tearRate','add']
+
+    lensesTree = tree_demo.createTree(lenses,lensesLabels,'ID3')
+    treePlotter_demo.createPlot(lensesTree)
