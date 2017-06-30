@@ -34,5 +34,5 @@ if __name__ == "__main__":
     print(listOPosts)
     print(listClasses)
 
-    myVocabList = bayes.createVocabList(listClasses)
+    myVocabList = bayes.createVocabList(listOPosts)
     print(myVocabList)
