@@ -37,7 +37,7 @@ def stocGradAscent0(dataMatrix,classLabel):
     m,n = shape(dataMatrix)
     alpha = 0.01
     weights = ones(n) # it is a array,w: [ 1.  1.  1.], not a list, list is like [1,2,3,4]
-    print("w:",weights)
+
     for i in range(m):
         h = sigmoid(sum(dataMatrix[i]*weights))
         error = classLabel[i] -h
@@ -76,8 +76,8 @@ if __name__ == "__main__":
     dataArr,labelMat = logRegres.loadDataSet()
     #weights=logRegres.gradAscent(dataArr,labelMat)
     weights = logRegres.stocGradAscent0(dataArr, labelMat)
-    print(weights)
+    #print(weights)
     #print(weights.getA())
+    print("the computed weight:\n",weights)
 
     logRegres.plotBestFit(weights)
-
