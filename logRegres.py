@@ -12,8 +12,8 @@ def loadDataSet():
     return dataMat,labelMat
 
 def sigmoid(inX):
-    sigmoid_output=1.0/(1+np.exp(-inX))
-    print("sigmoid_output:",sigmoid_output)
+    sigmoid_output=1.0/(1+exp(-inX))
+    #print("sigmoid_output:",sigmoid_output)
     return sigmoid_output
 
 def gradAscent(dataMatIn,classLabels):
@@ -36,20 +36,17 @@ def gradAscent(dataMatIn,classLabels):
 def stocGradAscent0(dataMatrix,classLabel):
     m,n = shape(dataMatrix)
     alpha = 0.01
-    weights = ones(n)
+    weights = ones(n) # it is a array,w: [ 1.  1.  1.], not a list, list is like [1,2,3,4]
     print("w:",weights)
     for i in range(m):
         h = sigmoid(sum(dataMatrix[i]*weights))
-        print(h)
         error = classLabel[i] -h
-        error_alpha = error*alpha
-        print("error_alpha:",error_alpha)
-        print("error:",error)
-        print("dataMatrix:",dataMatrix[i])
-        print("wegihts:",weights)
-        print("Add w+data:",weights+dataMatrix[i])
-        print("alpha:",error_alpha*dataMatrix[i])
-        weights = weights + alpha*error*dataMatrix[i]
+        weights = weights + alpha*error*array(dataMatrix[i])
+        #it needs to convert list into array,cause you can multiply a list with an integer, but not a float
+        #>>> [1] * 4
+        #[1, 1, 1, 1]
+        #but not by a float:
+        #[1] * 4.0,  TypeError: can't multiply sequence by non-int of type 'float'
     return  weights
 
 def plotBestFit(weights):
