@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Jul  6 08:32:05 2017
-
 @author: Liu-Da
 """
 
@@ -56,6 +55,22 @@ def stocGradAscent0(dataMatrix,classLabel):
         #[1] * 4.0,  TypeError: can't multiply sequence by non-int of type 'float'
     return  weights
 
+def stocGradAscent1(dataMatrix, classLabels, numIter=150):
+    m,n = shape(dataMatrix)
+    weights = ones(n)   #initialize to all ones
+    for j in range(numIter):
+        dataIndex = list(range(m))# convert range type into list
+        for i in range(m):
+            alpha = 4/(1.0+j+i)+0.0001    #apha decreases with iteration, does not
+            randIndex = int(random.uniform(0,len(dataIndex)))#go to 0 because of the constant
+            h = sigmoid(sum(dataMatrix[randIndex]*weights))
+            error = classLabels[randIndex] - h
+            weights = weights + alpha * error * dataMatrix[randIndex]
+            #print("type of dataIndex[randIndex]:",dataIndex[randIndex])
+            del(dataIndex[randIndex])
+    return weights
+
+
 def plotBestFit(weights):
     import matplotlib.pyplot as plt
     dataMat,labelMat=loadDataSet()
@@ -85,12 +100,17 @@ if __name__ == "__main__":
 
 
     weights = logRegres.gradAscent(dataArr, labelMat)
-    print("the computed weight of gradAscent:\n",weights)
+    print("\nthe computed weight of gradAscent:\n",weights)
     print("type of weights:",type(weights))
     print("type of weights.getA:", type(weights.getA))#convert self from matrix to  ndarray
     logRegres.plotBestFit(weights.getA())
 
     weights = logRegres.stocGradAscent0(dataArr, labelMat)
-    print("type of weights from stocGradAscent0:", type(weights))
+    print("\ntype of weights from stocGradAscent0:", type(weights))
     print("the computed weight of stocGradAscent0:\n",weights)
+    logRegres.plotBestFit(weights)
+
+    weights = logRegres.stocGradAscent1(array(dataArr),labelMat)
+    print("\ntype of weights from stocGradAscent1:", type(weights))
+    print("the computed weight of stocGradAscent1:\n", weights)
     logRegres.plotBestFit(weights)
