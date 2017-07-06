@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Jul  6 08:32:05 2017
+
+@author: Liu-Da
+"""
+
 from numpy import *
 import numpy as np
 def loadDataSet():
@@ -74,10 +81,16 @@ def plotBestFit(weights):
 if __name__ == "__main__":
     import logRegres
     dataArr,labelMat = logRegres.loadDataSet()
-    #weights=logRegres.gradAscent(dataArr,labelMat)
-    weights = logRegres.stocGradAscent0(dataArr, labelMat)
-    #print(weights)
-    #print(weights.getA())
-    print("the computed weight:\n",weights)
 
+
+
+    weights = logRegres.gradAscent(dataArr, labelMat)
+    print("the computed weight of gradAscent:\n",weights)
+    print("type of weights:",type(weights))
+    print("type of weights.getA:", type(weights.getA))#convert self from matrix to  ndarray
+    logRegres.plotBestFit(weights.getA())
+
+    weights = logRegres.stocGradAscent0(dataArr, labelMat)
+    print("type of weights from stocGradAscent0:", type(weights))
+    print("the computed weight of stocGradAscent0:\n",weights)
     logRegres.plotBestFit(weights)
