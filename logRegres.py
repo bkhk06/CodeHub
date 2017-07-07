@@ -6,6 +6,7 @@ Created on Thu Jul  6 08:32:05 2017
 
 from numpy import *
 import numpy as np
+
 def loadDataSet():
     dataMat = [];labelMat=[]
     fr = open('testSet.txt')
@@ -61,14 +62,56 @@ def stocGradAscent1(dataMatrix, classLabels, numIter=150):
     for j in range(numIter):
         dataIndex = list(range(m))# convert range type into list
         for i in range(m):
-            alpha = 4/(1.0+j+i)+0.0001    #apha decreases with iteration, does not
-            randIndex = int(random.uniform(0,len(dataIndex)))#go to 0 because of the constant
+            alpha = 4/(1.0+j+i)+0.01    #apha decreases with iteration, does not
+            random_num = random.uniform(0,len(dataIndex))
+            #print("random_num:",random_num)
+            randIndex = int(random_num)#go to 0 because of the constant
+            #print("randIndex:",randIndex)
             h = sigmoid(sum(dataMatrix[randIndex]*weights))
-            error = classLabels[randIndex] - h
-            weights = weights + alpha * error * dataMatrix[randIndex]
-            #print("type of dataIndex[randIndex]:",dataIndex[randIndex])
+            #print("type of H:",h,type(h))
+            #print("type of classLabels[randIndex]:",classLabels[randIndex],type(classLabels[int(randIndex)]))
+            error = float(classLabels[randIndex]) - h
+            #if report data type error, convert it
+            weights = weights + alpha * error * array(dataMatrix[randIndex])
             del(dataIndex[randIndex])
     return weights
+
+def classifyVector(inX,weights):
+    prob = sigmoid(sum(inX*weights))
+    if prob >0.5:return 1.0
+    else: return 0.0
+
+def colicTest():
+    frTrain = open('horseColicTraining.txt'); frTest = open('horseColicTest.txt')
+    trainingSet = []; trainingLabels = []
+    for line in frTrain.readlines():
+        currLine = line.strip().split('\t')
+        lineArr =[]
+        for i in range(21):
+            lineArr.append(float(currLine[i]))
+        trainingSet.append(lineArr)
+        trainingLabels.append(float(currLine[21]))
+    trainWeights = stocGradAscent1(array(trainingSet), trainingLabels, 1000)
+    errorCount = 0; numTestVec = 0.0
+    for line in frTest.readlines():
+        numTestVec += 1.0
+        currLine = line.strip().split('\t')
+        lineArr =[]
+        for i in range(21):
+            lineArr.append(float(currLine[i]))
+        if int(classifyVector(array(lineArr), trainWeights))!= int(currLine[21]):
+            errorCount += 1
+    errorRate = (float(errorCount)/numTestVec)
+    print ("the error rate of this test is: %f" % errorRate)
+    return errorRate
+
+
+def multiTest():
+    numTests = 10;
+    errorSum = 0.0
+    for k in range(numTests):
+        errorSum += colicTest()
+    print("after %d iterations the average error rate is: %f" % (numTests, errorSum / float(numTests)))
 
 
 def plotBestFit(weights):
@@ -90,14 +133,13 @@ def plotBestFit(weights):
     x = arange(-3.0, 3.0, 0.1)
     y = (-weights[0]-weights[1]*x)/weights[2]
     ax.plot(x, y)
-    plt.xlabel('X1'); plt.ylabel('X2');
+    plt.xlabel('X'); plt.ylabel('Y');
     plt.show()
+
 
 if __name__ == "__main__":
     import logRegres
     dataArr,labelMat = logRegres.loadDataSet()
-
-
 
     weights = logRegres.gradAscent(dataArr, labelMat)
     print("\nthe computed weight of gradAscent:\n",weights)
@@ -114,3 +156,5 @@ if __name__ == "__main__":
     print("\ntype of weights from stocGradAscent1:", type(weights))
     print("the computed weight of stocGradAscent1:\n", weights)
     logRegres.plotBestFit(weights)
+
+    logRegres.multiTest()
