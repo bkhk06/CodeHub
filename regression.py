@@ -79,17 +79,8 @@ if __name__ == "__main__":
     #print("yArr[0]: ",yArr[0])
     #print(regression.lwlr(xArr[0],xArr,yArr,1.0))
 
-
-    # m_xArr = shape(xArr)[0]
-    # for i in range(m_xArr):
-    #     #print("xArr: ",xArr[i])
-    #     yHat[i] = lwlr(xArr[i],xArr,yArr,0.01)
-    #     #print("yHat: ",yHat[i])
-    # #yHat = mat(yHat)
-    # print("yHat: ", shape(mat(yHat)))
-    #
-    # print("xArr[10] ",xArr[10])
-    # #yHat = lwlr(xArr,xArr,yArr,0.003)
+    ##print("xArr[10] ",xArr[10])
+    #yHat = lwlr(xArr,xArr,yArr,0.003)
 
     #print(xArr)
     xMat = mat(xArr)
@@ -97,7 +88,7 @@ if __name__ == "__main__":
     xSort = xMat[srtInd][:,0,:]
     yHat = lwlrTest(xArr,xArr,yArr,0.003)
     #print(yHat)
-    #yHat.sort(0)
+    #yHat.sort(0)#
 
     import matplotlib.pyplot as plt2
 
@@ -108,6 +99,6 @@ if __name__ == "__main__":
     print(shape(xSort[:,1]))
     print(shape(yHat[srtInd]))
     ax2.plot(xSort[:,1],yHat[srtInd])
+    #ax2.plot(xSort[:,1],yHat)
     ax2.scatter(xMat[:,1].flatten().A[0],mat(yArr).T.flatten().A[0],s=2,c='red')
     plt2.show()
-
