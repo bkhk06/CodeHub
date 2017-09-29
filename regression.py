@@ -102,3 +102,27 @@ if __name__ == "__main__":
     #ax2.plot(xSort[:,1],yHat)
     ax2.scatter(xMat[:,1].flatten().A[0],mat(yArr).T.flatten().A[0],s=2,c='red')
     plt2.show()
+    
+    #predict the abalone's age， that need to comment above codes firstly
+    abX, abY = loadDataSet('abalone.txt')
+
+    yHat01 = lwlrTest(mat(abX[0:99]),abX[0:99],abY[0:99],0.1)
+    yHat1 = lwlrTest(abX[0:99], abX[0:99], abY[0:99], 1)
+    yHat10 = lwlrTest(abX[0:99], abX[0:99], abY[0:99], 10)
+
+    print("rssError(abY[0:99],yHat01.T: ",rssError(abY[0:99],yHat01.T))
+    print("rssError(abY[0:99],yHat1.T: ", rssError(abY[0:99], yHat1.T))
+    print("rssError(abY[0:99],yHat10.T: ", rssError(abY[0:99], yHat10.T))
+    print("######################################")
+    yHat01 = lwlrTest(mat(abX[100:199]), abX[0:99], abY[0:99], 0.1)
+    yHat1 = lwlrTest(abX[100:199], abX[0:99], abY[0:99], 1)
+    yHat10 = lwlrTest(abX[100:199], abX[0:99], abY[0:99], 10)
+
+    print("rssError(abY[0:99],yHat01.T: ", rssError(abY[100:199], yHat01.T))
+    print("rssError(abY[0:99],yHat1.T: ", rssError(abY[100:199], yHat1.T))
+    print("rssError(abY[0:99],yHat10.T: ", rssError(abY[100:199], yHat10.T))
+
+    print("##################################$$$$$$")
+    ws = standRegres(abX[0:99],abY[0:99])
+    yHat = mat(abX[100:199])*ws
+    print("rssError(abY[100:199],yHat.T.A: ",rssError(abY[100:199],yHat.T.A))
