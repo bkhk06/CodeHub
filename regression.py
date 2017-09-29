@@ -126,3 +126,15 @@ if __name__ == "__main__":
     ws = standRegres(abX[0:99],abY[0:99])
     yHat = mat(abX[100:199])*ws
     print("rssError(abY[100:199],yHat.T.A: ",rssError(abY[100:199],yHat.T.A))
+    
+    # predict the abalone's age with ridgeRegres， that need to comment above codes firstly
+    abX,abY = loadDataSet('abalone.txt')
+    ridgeWeights =  ridgeTest(abX,abY)
+    print("ridgeWeights: \n",ridgeWeights)
+    print("shape of ridgeWeights ",shape(ridgeWeights))
+    import matplotlib.pyplot as plt3
+    fig3 = plt3.figure()
+    ax3 = fig3.add_subplot(111)
+    ax3.plot(ridgeWeights)
+    plt3.show()
+
