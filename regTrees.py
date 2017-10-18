@@ -1,3 +1,5 @@
+######### The codes as below can be run successfully in python 2.7, but failed in python3
+
 from numpy import *
 
 def loadDataSet(filename):
