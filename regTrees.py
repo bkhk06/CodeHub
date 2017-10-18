@@ -1,5 +1,3 @@
-######### The codes as below can be run successfully in python 2.7, but failed in python3
-
 from numpy import *
 
 def loadDataSet(filename):
@@ -32,6 +30,7 @@ def loadDataSet(filename):
 #     return dataMat#,labelMat
 
 def binSplitDataSet(dataSet,feature,value):
+    #dataSet = array(dataSet)
     mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:][0]
     mat1 = dataSet[nonzero(dataSet[:,feature] <= value)[0], :][0]
     return mat0,mat1
@@ -69,16 +68,16 @@ def chooseBestSplit(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):
         return None, leafType(dataSet)
     else:
         m,n = shape(dataSet)
-        print("m= ",m,"n= ",n)
+        #print("m= ",m,"n= ",n)
         #the choice of the best feature is driven by Reduction in RSS error from mean
         S = errType(dataSet)
         bestS = inf; bestIndex = 0; bestValue = 0
         for featIndex in range(n-1):
-            print("featIndex: ",featIndex)
-            print("(dataSet[:,featIndex].T.A.tolist())[0]: ",(dataSet[:,featIndex].T.A.tolist())[0])
+            #print("featIndex: ",featIndex)
+            #print("(dataSet[:,featIndex].T.A.tolist())[0]: ",(dataSet[:,featIndex].T.A.tolist())[0])
             for splitVal in set((dataSet[:,featIndex].T.A.tolist())[0]):#set(dataSet[:,featIndex]):
                 mat0, mat1 = binSplitDataSet(dataSet, featIndex, splitVal)
-                print("\nsplitVal:",splitVal,"mat0: ",mat0,"mat1: ",mat1)
+                #print("\nsplitVal:",splitVal,"mat0: ",mat0,"mat1: ",mat1)
                 if (shape(mat0)[0] < tolN) or (shape(mat1)[0] < tolN):
                     continue
                 newS = errType(mat0) + errType(mat1)
@@ -110,15 +109,21 @@ def createTree(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):#assume dat
 
 if __name__ == "__main__":
     import regTrees
-    testMat = mat(eye(4))
-    print(testMat)
-    mat0,mat1 = binSplitDataSet(testMat,1,0.5)
-    print("\nmat0:\n",mat0)
-    print("mat1:\n",mat1)
+    # testMat = mat(eye(4))
+    # print(testMat)
+    # mat0,mat1 = binSplitDataSet(testMat,1,0.5)
+    # print("\nmat0:/n",mat0)
+    # print("mat1:/n",mat1)
 
 
-    myDat = regTrees.loadDataSet('ex00.txt')
+    myDat = regTrees.loadDataSet('ex0.txt')
     #print(myDat)
     myDat = mat(myDat)
-    print(myDat)
-    print(regTrees.createTree(myDat))
+    #print(myDat)
+    print "createTree for ex0:\n",regTrees.createTree(myDat)
+
+    myDat = regTrees.loadDataSet('ex00.txt')
+    # print(myDat)
+    myDat = mat(myDat)
+    # print(myDat)
+    print "\ncreateTree for ex00:\n",regTrees.createTree(myDat)
