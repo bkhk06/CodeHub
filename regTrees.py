@@ -1,4 +1,5 @@
 from numpy import *
+import numpy as np
 
 def loadDataSet(filename):
     dataMat = []
@@ -127,3 +128,11 @@ if __name__ == "__main__":
     myDat = mat(myDat)
     # print(myDat)
     print "\ncreateTree for ex00:\n",regTrees.createTree(myDat)
+
+    ####################prepuning
+    print "\nOps(0,1):\n",createTree(myDat,ops=(0,1))
+
+    #########################ex2
+    myData2 = loadDataSet('ex2.txt')
+    myData2 = mat(myData2)
+    print "\nmyData2 : \n",createTree(myData2)
