@@ -3,11 +3,31 @@ from numpy import *
 def loadDataSet(filename):
     dataMat = []
     fr = open(filename)
+    #print(fr)
     for line in fr.readlines():
         curLine = line.split('\t')
         fltLine = map(float,curLine)
+        fltLine=list(fltLine)##python 2 and 3 difference
         dataMat.append(fltLine)
     return dataMat
+
+
+# def loadDataSet(filename):
+#     numFeat = len(open(filename).readline().split('\t'))#-1
+#     dataMat = [];#labelMat = []
+#     fr = open(filename)
+#     #print("fr\n: ",fr.readlines())
+#     for line in fr.readlines():
+#         lineArr = []
+#         curLine = line.strip().split('\t')
+#         #print("numFeat: ",numFeat)
+#         for i in range(numFeat):
+#             lineArr.append(float(curLine[i]))
+#         fltLine = map(float, lineArr)
+#         dataMat.append(fltLine)
+#         #print(dataMat)
+#         #labelMat.append(float(curLine[-1]))
+#     return dataMat#,labelMat
 
 def binSplitDataSet(dataSet,feature,value):
     mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:][0]
@@ -45,26 +65,32 @@ def chooseBestSplit(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):
     #if all the target variables are the same value: quit and return value
     if len(set(dataSet[:,-1].T.tolist()[0])) == 1: #exit cond 1
         return None, leafType(dataSet)
-    m,n = shape(dataSet)
-    #the choice of the best feature is driven by Reduction in RSS error from mean
-    S = errType(dataSet)
-    bestS = inf; bestIndex = 0; bestValue = 0
-    for featIndex in range(n-1):
-        for splitVal in set(dataSet[:,featIndex]):
-            mat0, mat1 = binSplitDataSet(dataSet, featIndex, splitVal)
-            if (shape(mat0)[0] < tolN) or (shape(mat1)[0] < tolN): continue
-            newS = errType(mat0) + errType(mat1)
-            if newS < bestS:
-                bestIndex = featIndex
-                bestValue = splitVal
-                bestS = newS
-    #if the decrease (S-bestS) is less than a threshold don't do the split
-    if (S - bestS) < tolS:
-        return None, leafType(dataSet) #exit cond 2
-    mat0, mat1 = binSplitDataSet(dataSet, bestIndex, bestValue)
-    if (shape(mat0)[0] < tolN) or (shape(mat1)[0] < tolN):  #exit cond 3
-        return None, leafType(dataSet)
-    return bestIndex,bestValue#returns the best feature to split on
+    else:
+        m,n = shape(dataSet)
+        print("m= ",m,"n= ",n)
+        #the choice of the best feature is driven by Reduction in RSS error from mean
+        S = errType(dataSet)
+        bestS = inf; bestIndex = 0; bestValue = 0
+        for featIndex in range(n-1):
+            print("featIndex: ",featIndex)
+            print("(dataSet[:,featIndex].T.A.tolist())[0]: ",(dataSet[:,featIndex].T.A.tolist())[0])
+            for splitVal in set((dataSet[:,featIndex].T.A.tolist())[0]):#set(dataSet[:,featIndex]):
+                mat0, mat1 = binSplitDataSet(dataSet, featIndex, splitVal)
+                print("\nsplitVal:",splitVal,"mat0: ",mat0,"mat1: ",mat1)
+                if (shape(mat0)[0] < tolN) or (shape(mat1)[0] < tolN):
+                    continue
+                newS = errType(mat0) + errType(mat1)
+                if newS < bestS:
+                    bestIndex = featIndex
+                    bestValue = splitVal
+                    bestS = newS
+        #if the decrease (S-bestS) is less than a threshold don't do the split
+        if (S - bestS) < tolS:
+            return None, leafType(dataSet) #exit cond 2
+        mat0, mat1 = binSplitDataSet(dataSet, bestIndex, bestValue)
+        if (shape(mat0)[0] < tolN) or (shape(mat1)[0] < tolN):  #exit cond 3
+            return None, leafType(dataSet)
+        return bestIndex,bestValue#returns the best feature to split on
                               #and the value used for that split
 
 def createTree(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):#assume dataSet is NumPy Mat so we can array filtering
@@ -89,7 +115,8 @@ if __name__ == "__main__":
     print("mat1:\n",mat1)
 
 
-    # myDat = regTrees.loadDataSet('ex00.txt')
-    # myDat = mat(myDat)
-    # print(myDat)
-    # print(regTrees.createTree(myDat))
+    myDat = regTrees.loadDataSet('ex00.txt')
+    #print(myDat)
+    myDat = mat(myDat)
+    print(myDat)
+    print(regTrees.createTree(myDat))
