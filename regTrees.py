@@ -32,6 +32,8 @@ def loadDataSet(filename):
 
 def binSplitDataSet(dataSet,feature,value):
     #dataSet = array(dataSet)
+    #dataSet = np.array(dataSet)
+    print "array: ",dataSet
     mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:][0]
     mat1 = dataSet[nonzero(dataSet[:,feature] <= value)[0], :][0]
     return mat0,mat1
@@ -105,6 +107,46 @@ def createTree(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):#assume dat
     retTree['left'] = createTree(lSet, leafType, errType, ops)
     retTree['right'] = createTree(rSet, leafType, errType, ops)
     return retTree
+
+def isTree(obj):
+    return (type(obj)._name_=='dict')
+
+def getMean(tree):
+    if isTree(tree['right']):tree['right'] = getMean(tree['right'])
+    if isTree(tree['left']):tree['left'] = getMean(tree['left'])
+    return (tree['left']+tree['right'])/2.0
+
+def prune(tree,testData):
+    if shape(testData)[0] ==0:
+        return getMean(tree)
+    if (isTree(tree['right']) or isTree(['left'])):
+        lSet,rSet = binSplitDataSet(testData,tree['spInd'],tree['spVal'])
+        errorNoMerge = sum(power(lSet[:,-1]-tree['left'],2)) + sum(power(rSet[:,-1]-tree['right'],2))
+        treeMean = (tree['left']+tree['right'])/2.0
+        errorMerge = sum(power(testData[:,-1]-treeMean,2))
+        if errorMerge<errorNoMerge
+            print "merging"
+            return treeMean
+        else:return tree
+
+def linearSolve(dataSet):
+    m,n = shape(dataSet)
+    X = mat(ones((m,n)));Y = mat(ones((m,1)))
+    X[:,1:n] = dataSet[:,0:n-1];Y = dataSet[:,-1]
+    xTx = X.T*X
+    if linalg.det(xTx) == 0.0:
+        raise NameError('This matrix is sigular,cannot do inverse,\n try increasing the second value of ops')
+    ws = xTx.I*(X.T*Y)
+    return ws,X,Y
+
+def modeleaf(dataSet):
+    ws,X,Y = linearSolve(dataSet)
+    return ws
+
+def modelErr(dataSet):
+    ws,X,Y = linearSolve(dataSet)
+    yHat = X*ws
+    return sum(pow(Y-yHat),2)
 
 
 
