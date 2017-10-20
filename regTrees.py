@@ -34,6 +34,8 @@ def binSplitDataSet(dataSet,feature,value):
     #dataSet = array(dataSet)
     #dataSet = np.array(dataSet)
     #print "array: ",dataSet
+    # tmp = dataSet[:,feature]
+    # print("tmp\n",tmp)
     mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:]
     mat1 = dataSet[nonzero(dataSet[:,feature] <= value)[0], :]
     #remove [0],then run soothly.
@@ -110,25 +112,31 @@ def createTree(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):#assume dat
     return retTree
 
 def isTree(obj):
-    return (type(obj)._name_=='dict')
+    return (type(obj).__name__=='dict')
 
 def getMean(tree):
     if isTree(tree['right']):tree['right'] = getMean(tree['right'])
     if isTree(tree['left']):tree['left'] = getMean(tree['left'])
     return (tree['left']+tree['right'])/2.0
 
-def prune(tree,testData):
-    if shape(testData)[0] ==0:
-        return getMean(tree)
-    if (isTree(tree['right']) or isTree(['left'])):
-        lSet,rSet = binSplitDataSet(testData,tree['spInd'],tree['spVal'])
-        errorNoMerge = sum(pow(lSet[:,-1]-tree['left'],2)) + sum(pow(rSet[:,-1]-tree['right'],2))
+def prune(tree, testData):
+    if shape(testData)[0] == 0: return getMean(tree) #if we have no test data collapse the tree
+    if (isTree(tree['right']) or isTree(tree['left'])):#if the branches are not trees try to prune them
+        lSet, rSet = binSplitDataSet(testData, tree['spInd'], tree['spVal'])
+    if isTree(tree['left']): tree['left'] = prune(tree['left'], lSet)
+    if isTree(tree['right']): tree['right'] =  prune(tree['right'], rSet)
+    #if they are now both leafs, see if we can merge them
+    if not isTree(tree['left']) and not isTree(tree['right']):
+        lSet, rSet = binSplitDataSet(testData, tree['spInd'], tree['spVal'])
+        errorNoMerge = sum(power(lSet[:,-1] - tree['left'],2)) +\
+            sum(power(rSet[:,-1] - tree['right'],2))
         treeMean = (tree['left']+tree['right'])/2.0
-        errorMerge = sum(pow(testData[:,-1]-treeMean,2))
-        if errorMerge<errorNoMerge:
+        errorMerge = sum(power(testData[:,-1] - treeMean,2))
+        if errorMerge < errorNoMerge:
             print ("merging")
             return treeMean
-        else:return tree
+        else: return tree
+    else: return tree
 
 def linearSolve(dataSet):
     m,n = shape(dataSet)
@@ -140,42 +148,53 @@ def linearSolve(dataSet):
     ws = xTx.I*(X.T*Y)
     return ws,X,Y
 
-def modeleaf(dataSet):
+def modelLeaf(dataSet):
     ws,X,Y = linearSolve(dataSet)
     return ws
 
 def modelErr(dataSet):
     ws,X,Y = linearSolve(dataSet)
     yHat = X*ws
-    return sum(pow(Y-yHat),2)
-
+    return sum(pow(Y-yHat,2))
 
 
 if __name__ == "__main__":
     import regTrees
     testMat = mat(eye(4))
     print ("\ntestData:\n",testMat)
-    mat0,mat1 = binSplitDataSet(testMat,1,0.5)
+    mat0,mat1 = binSplitDataSet(testMat,2,0.5)
     print ("\nmat0:\n",mat0)
     print ("mat1:\n",mat1)
 
+    myDat = regTrees.loadDataSet('ex00.txt')
+    myDat = mat(myDat)
+    print("\ncreateTree for ex00:\n", regTrees.createTree(myDat))
 
     myDat = regTrees.loadDataSet('ex0.txt')
-    #print(myDat)
     myDat = mat(myDat)
-    #print(myDat)
-    print ("createTree for ex0:\n",regTrees.createTree(myDat))
-
-    myDat = regTrees.loadDataSet('ex00.txt')
-    # print(myDat)
-    myDat = mat(myDat)
-    # print(myDat)
-    print ("\ncreateTree for ex00:\n",regTrees.createTree(myDat))
+    print ("\ncreateTree for ex0:\n",regTrees.createTree(myDat))
 
     ####################prepuning
+    print("\nPrepruning\n###########")
     print ("\nOps(0,1):\n",createTree(myDat,ops=(0,1)))
 
     #########################ex2
-    myData2 = loadDataSet('ex2.txt')
-    myData2 = mat(myData2)
-    print ("\nmyData2 : \n",createTree(myData2))
+    myDat2 = loadDataSet('ex2.txt')
+    myDat2 = mat(myDat2)
+    print ("\nmyData2 : \n",createTree(myDat2))
+    print("\nmyData2 : ops=(1000,4) \n", createTree(myDat2,ops=(1000,4)))
+
+    ####################postpuning
+    myDat2 = loadDataSet('ex2.txt')
+    myMat2 = mat(myDat2)
+    myTree = createTree(myMat2,ops=(0,1))
+    myDataTest = loadDataSet('ex2test.txt')
+    myMat2Test = mat(myDataTest)
+
+    print("\nPruning:\n",prune(myTree,myMat2Test))
+
+
+    #####
+    print("\nModel Tree:\n")
+    print(createTree(myMat2,modelLeaf(myMat2),modelErr(myMat2),(1,10)))
+
