@@ -33,9 +33,10 @@ def loadDataSet(filename):
 def binSplitDataSet(dataSet,feature,value):
     #dataSet = array(dataSet)
     #dataSet = np.array(dataSet)
-    print "array: ",dataSet
-    mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:][0]
-    mat1 = dataSet[nonzero(dataSet[:,feature] <= value)[0], :][0]
+    #print "array: ",dataSet
+    mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:]
+    mat1 = dataSet[nonzero(dataSet[:,feature] <= value)[0], :]
+    #remove [0],then run soothly.
     return mat0,mat1
 
 def regLeaf(dataSet):#returns the value used for each leaf
@@ -62,7 +63,7 @@ def modelLeaf(dataSet):#create linear model and return coeficients
 def modelErr(dataSet):
     ws,X,Y = linearSolve(dataSet)
     yHat = X * ws
-    return sum(power(Y - yHat,2))
+    return sum(pow(Y - yHat,2))
 
 def chooseBestSplit(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):
     tolS = ops[0]; tolN = ops[1]
@@ -121,11 +122,11 @@ def prune(tree,testData):
         return getMean(tree)
     if (isTree(tree['right']) or isTree(['left'])):
         lSet,rSet = binSplitDataSet(testData,tree['spInd'],tree['spVal'])
-        errorNoMerge = sum(power(lSet[:,-1]-tree['left'],2)) + sum(power(rSet[:,-1]-tree['right'],2))
+        errorNoMerge = sum(pow(lSet[:,-1]-tree['left'],2)) + sum(pow(rSet[:,-1]-tree['right'],2))
         treeMean = (tree['left']+tree['right'])/2.0
-        errorMerge = sum(power(testData[:,-1]-treeMean,2))
-        if errorMerge<errorNoMerge
-            print "merging"
+        errorMerge = sum(pow(testData[:,-1]-treeMean,2))
+        if errorMerge<errorNoMerge:
+            print ("merging")
             return treeMean
         else:return tree
 
@@ -152,29 +153,29 @@ def modelErr(dataSet):
 
 if __name__ == "__main__":
     import regTrees
-    # testMat = mat(eye(4))
-    # print(testMat)
-    # mat0,mat1 = binSplitDataSet(testMat,1,0.5)
-    # print("\nmat0:/n",mat0)
-    # print("mat1:/n",mat1)
+    testMat = mat(eye(4))
+    print ("\ntestData:\n",testMat)
+    mat0,mat1 = binSplitDataSet(testMat,1,0.5)
+    print ("\nmat0:\n",mat0)
+    print ("mat1:\n",mat1)
 
 
     myDat = regTrees.loadDataSet('ex0.txt')
     #print(myDat)
     myDat = mat(myDat)
     #print(myDat)
-    print "createTree for ex0:\n",regTrees.createTree(myDat)
+    print ("createTree for ex0:\n",regTrees.createTree(myDat))
 
     myDat = regTrees.loadDataSet('ex00.txt')
     # print(myDat)
     myDat = mat(myDat)
     # print(myDat)
-    print "\ncreateTree for ex00:\n",regTrees.createTree(myDat)
+    print ("\ncreateTree for ex00:\n",regTrees.createTree(myDat))
 
     ####################prepuning
-    print "\nOps(0,1):\n",createTree(myDat,ops=(0,1))
+    print ("\nOps(0,1):\n",createTree(myDat,ops=(0,1)))
 
     #########################ex2
     myData2 = loadDataSet('ex2.txt')
     myData2 = mat(myData2)
-    print "\nmyData2 : \n",createTree(myData2)
+    print ("\nmyData2 : \n",createTree(myData2))
