@@ -155,46 +155,47 @@ def modelLeaf(dataSet):
 def modelErr(dataSet):
     ws,X,Y = linearSolve(dataSet)
     yHat = X*ws
-    return sum(pow(Y-yHat,2))
+    #print(yHat)
+    return sum(power(Y-yHat,2))
 
 
 if __name__ == "__main__":
     import regTrees
-    testMat = mat(eye(4))
-    print ("\ntestData:\n",testMat)
-    mat0,mat1 = binSplitDataSet(testMat,2,0.5)
-    print ("\nmat0:\n",mat0)
-    print ("mat1:\n",mat1)
-
-    myDat = regTrees.loadDataSet('ex00.txt')
-    myDat = mat(myDat)
-    print("\ncreateTree for ex00:\n", regTrees.createTree(myDat))
-
-    myDat = regTrees.loadDataSet('ex0.txt')
-    myDat = mat(myDat)
-    print ("\ncreateTree for ex0:\n",regTrees.createTree(myDat))
-
-    ####################prepuning
-    print("\nPrepruning\n###########")
-    print ("\nOps(0,1):\n",createTree(myDat,ops=(0,1)))
-
-    #########################ex2
-    myDat2 = loadDataSet('ex2.txt')
-    myDat2 = mat(myDat2)
-    print ("\nmyData2 : \n",createTree(myDat2))
-    print("\nmyData2 : ops=(1000,4) \n", createTree(myDat2,ops=(1000,4)))
-
-    ####################postpuning
-    myDat2 = loadDataSet('ex2.txt')
-    myMat2 = mat(myDat2)
-    myTree = createTree(myMat2,ops=(0,1))
-    myDataTest = loadDataSet('ex2test.txt')
-    myMat2Test = mat(myDataTest)
-
-    print("\nPruning:\n",prune(myTree,myMat2Test))
+    # testMat = mat(eye(4))
+    # print ("\ntestData:\n",testMat)
+    # mat0,mat1 = binSplitDataSet(testMat,2,0.5)
+    # print ("\nmat0:\n",mat0)
+    # print ("mat1:\n",mat1)
+    #
+    # myDat = regTrees.loadDataSet('ex00.txt')
+    # myDat = mat(myDat)
+    # print("\ncreateTree for ex00:\n", regTrees.createTree(myDat))
+    #
+    # myDat = regTrees.loadDataSet('ex0.txt')
+    # myDat = mat(myDat)
+    # print ("\ncreateTree for ex0:\n",regTrees.createTree(myDat))
+    #
+    # ####################prepuning
+    # print("\nPrepruning\n###########")
+    # print ("\nOps(0,1):\n",createTree(myDat,ops=(0,1)))
+    #
+    # #########################ex2
+    # myDat2 = loadDataSet('ex2.txt')
+    # myDat2 = mat(myDat2)
+    # print ("\nmyData2 : \n",createTree(myDat2))
+    # print("\nmyData2 : ops=(1000,4) \n", createTree(myDat2,ops=(1000,4)))
+    #
+    # ####################postpuning
+    # myDat2 = loadDataSet('ex2.txt')
+    # myMat2 = mat(myDat2)
+    # myTree = createTree(myMat2,ops=(0,1))
+    # myDataTest = loadDataSet('ex2test.txt')
+    # myMat2Test = mat(myDataTest)
+    #
+    # print("\nPruning:\n",prune(myTree,myMat2Test))
 
 
     #####
     print("\nModel Tree:\n")
-    print(createTree(myMat2,modelLeaf(myMat2),modelErr(myMat2),(1,10)))
-
+    myMat2 = mat(loadDataSet('exp2.txt'))
+    print(createTree(myMat2, modelLeaf, modelErr, (1, 10)))
