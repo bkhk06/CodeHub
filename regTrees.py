@@ -167,24 +167,24 @@ def modelTreeEval(model,inDat):
     X[:,1:n+1] = inDat
     return float(X*model)
 
-def treeForceCast(tree,inData,modelEval=regTreeEval):
+def treeForeCast(tree,inData,modelEval=regTreeEval):
     if not isTree(tree): return modelEval(tree,inData)
     if inData[tree['spInd']]>tree['spVal']:
         if isTree(tree['left']):
-            return treeForceCast(tree['left'],inData,modelEval)
+            return treeForeCast(tree['left'],inData,modelEval)
         else:
             return modelEval(tree['left'],inData)
     else:
         if isTree(tree['right']):
-            return treeForceCast(tree['right'],inData,modelEval)
+            return treeForeCast(tree['right'],inData,modelEval)
         else:
             return modelEval(tree['right'],inData)
 
-def createForceCast(tree,testData,modelEval=regTreeEval):
+def createForeCast(tree,testData,modelEval=regTreeEval):
     m=len(testData)
     yHat = mat(zeros((m,1)))
     for i in range(m):
-        yHat[i,0] = treeForceCast(tree,mat(testData[i]),modelEval)
+        yHat[i,0] = treeForeCast(tree,mat(testData[i]),modelEval)
     return yHat
 
 
@@ -207,11 +207,10 @@ def reDraw(tolS, tolN):
         if tolN < 2: tolN = 2
         myTree = regTrees.createTree(reDraw.rawDat, regTrees.modelLeaf, \
                                      regTrees.modelErr, (tolS, tolN))
-        yHat = regTrees.createForeCast(myTree, reDraw.testDat, \
-                                       regTrees.modelTreeEval)
+        yHat = regTrees.createForeCast(myTree, reDraw.testDat,regTrees.modelTreeEval)
     else:
         myTree = regTrees.createTree(reDraw.rawDat, ops=(tolS, tolN))
-        yHat = regTrees.createForceCast(myTree, reDraw.testDat)
+        yHat = regTrees.createForeCast(myTree, reDraw.testDat)
     reDraw.a.scatter(reDraw.rawDat[:, 0], reDraw.rawDat[:, 1], s=5)  # use scatter for data set
     reDraw.a.plot(reDraw.testDat, yHat, linewidth=2.0)  # use plot for yHat
     reDraw.canvas.show()
@@ -289,13 +288,13 @@ if __name__ == "__main__":
     myTree = createTree(trainMat,ops=(1,20))
     print(myTree)
 
-    yHat = createForceCast(myTree,testMat[:,0])
+    yHat = createForeCast(myTree,testMat[:,0])
     print("\ncorrcoef(yHat,testMat[:,1],rowvar=0)[0,1]: \n", corrcoef(yHat, testMat[:,1], rowvar=0)[0,1])
 
     #######
     print("\nCreate ModelTree:\n")
     myTree = createTree(trainMat,modelLeaf,modelErr,(1,20))
-    yHat = createForceCast(myTree,testMat[:,0],modelTreeEval)
+    yHat = createForeCast(myTree,testMat[:,0],modelTreeEval)
     print("\ncorrcoef(yHat,testMat[:,1],rowvar=0)[0,1]: \n", corrcoef(yHat, testMat[:, 1], rowvar=0)[0, 1])
 
     ########
@@ -335,4 +334,3 @@ if __name__ == "__main__":
     reDraw(1.0, 10)
 
     root.mainloop()
-
