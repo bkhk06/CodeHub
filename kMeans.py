@@ -28,6 +28,29 @@ def randCent(dataSet,k):
         centroids[:,j] = minJ+rangeJ*random.rand(k,1)
     return centroids
 
+def kMeans(dataSet,k,distMeas=distEclud,createCent=randCent):
+    m = shape(dataSet)[0]
+    clusterAssment = mat(zeros((m,2)))#The cluster assignment matrix, called clusterAssment, has two column
+    # one column is for the index of the cluster and the second column is to store the error.
+    centroids = createCent(dataSet,k)
+    clusterChanged = True
+    while clusterChanged:
+        clusterChanged = False
+        for i in range(m):
+            minDist = inf;minIndex = -1
+            for j in range(k):
+                distJI = distMeas(centroids[j,:],dataSet[i,:])
+                if distJI <minDist:
+                    minDist = distJI;minIndex = j
+            if clusterAssment[i,0]!=minIndex:
+                clusterChanged = True
+            clusterAssment[i,:] = minIndex,minDist**2
+        print("centroids: \n",centroids)
+        for cent in range(k):
+            ptsInClust = dataSet[nonzero(clusterAssment[:,0].A==cent)[0]]
+            centroids[cent,:] = mean(ptsInClust,axis=0)
+    return centroids,clusterAssment
+
 
 if __name__ == "__main__":
     import kMeans
@@ -41,3 +64,5 @@ if __name__ == "__main__":
     print("\nrandCent(dataMat,2):\n",randCent(dataMat,2))
     print("\ndistEclud(dataMat[0],dataMat[1]:\n",distEclud(dataMat[0],dataMat[1]))
 
+    myCentroids, clusterAssing = kMeans.kMeans(dataMat,4)
+    print("\nmyCentroids:\n",myCentroids, "\nclusterAssing:\n",clusterAssing)
