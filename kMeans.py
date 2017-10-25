@@ -64,5 +64,5 @@ if __name__ == "__main__":
     print("\nrandCent(dataMat,2):\n",randCent(dataMat,2))
     print("\ndistEclud(dataMat[0],dataMat[1]:\n",distEclud(dataMat[0],dataMat[1]))
 
-    myCentroids, clusterAssing = kMeans.kMeans(dataMat,4)
+    myCentroids, clusterAssing = kMeans.kMeans(dataMat,6)
     print("\nmyCentroids:\n",myCentroids, "\nclusterAssing:\n",clusterAssing)
