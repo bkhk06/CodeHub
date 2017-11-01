@@ -85,8 +85,6 @@ def rulesFromConseq(freqSet, H, supportData, brl, minConf=0.7):
         if (len(Hmp1) > 1):  # need at least two sets to merge
             rulesFromConseq(freqSet, Hmp1, supportData, brl, minConf)
 
-
-
 if __name__ == "__main__":
     import apriori
     dataSet = loadDataSet()
@@ -117,4 +115,17 @@ if __name__ == "__main__":
     rules = apriori.generalRules(L, suppData, minConf=0.5)
     print("\nrules:\n", rules)
 
+    # print("\n#########votesmart######\n")
+    # from votesmart import votesmart
+    # votesmart.apikey = '49024thereoncewasamanfromnantucket94040'
+    # bills = votesmart.votes.getBillsByStateRecent()
+    # for bill in bills:
+    #     print(bill.title,bill.billId)
+
+    print("\nMush######\n")
+    mushDatSet = [line.split() for line in open('mushroom.dat').readlines()]
+    L,suppData = apriori.apriori(mushDatSet,minSupport=0.3)
+    print(L[3])
+    for item in L[3]:
+         if item.intersection('2'): print(item)
 
