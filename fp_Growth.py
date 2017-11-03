@@ -75,6 +75,39 @@ def createInitSet(dataSet):
         retDict[frozenset(trans)] = 1
     return retDict
 
+def ascendTree(leafNode,prefixPath):
+    if leafNode.parent !=None:
+        prefixPath.append(leafNode.name)
+        ascendTree(leafNode.parent,prefixPath)
+
+def findPrefixPath(basePat,treeNode):
+    condPats = {}
+    while treeNode !=None:
+        prefixPath = []
+        ascendTree(treeNode,prefixPath)
+        if len(prefixPath)>1:
+            condPats[frozenset(prefixPath[1:])] = treeNode.count
+        treeNode = treeNode.nodeLink
+    return condPats
+
+def mineTree(inTree, headerTable, minSup, preFix, freqItemList):
+    bigL = [v[0] for v in sorted(headerTable.items(), key=lambda p: str(p[1]))]#(sort header table)
+    for basePat in bigL:  #start from bottom of header table
+        newFreqSet = preFix.copy()
+        newFreqSet.add(basePat)
+        print ('finalFrequent Item: ',newFreqSet)    #append to set
+        freqItemList.append(newFreqSet)
+        condPattBases = findPrefixPath(basePat, headerTable[basePat][1])
+        print ('condPattBases :',basePat, condPattBases)
+        #2. construct cond FP-tree from cond. pattern base
+        myCondTree, myHead = createTree(condPattBases, minSup)
+        print ('head from conditional tree: ', myHead)
+        if myHead != None: #3. mine cond. FP-tree
+            print ('conditional tree for: ',newFreqSet)
+            myCondTree.disp(1)
+            mineTree(myCondTree, myHead, minSup, newFreqSet, freqItemList)
+
+
 
 if __name__ == "__main__":
     import fp_Growth
@@ -94,3 +127,17 @@ if __name__ == "__main__":
     myFPtree,myHeaderTab = createTree(initSet,3)
     myFPtree.disp()
 
+    print(findPrefixPath('x',myHeaderTab['x'][1]))
+    print(findPrefixPath('z', myHeaderTab['z'][1]))
+    print(findPrefixPath('r', myHeaderTab['r'][1]))
+
+    freqItems = []
+    mineTree(myFPtree,myHeaderTab,3,set([]),freqItems)
+
+    print("\n########## News Mining:############\n")
+    parsedDat = [line.split() for line in open('kosarak.dat').readlines()]
+    initSet = createInitSet(parsedDat)
+    myFPtree,myHeaderTab = createTree(initSet,100000)
+    myFreqList = []
+    mineTree(myFPtree,myHeaderTab,100000,set([]),myFreqList)
+    print("\nmyFreqList:\n",myFreqList)
