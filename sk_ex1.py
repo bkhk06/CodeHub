@@ -1,0 +1,13 @@
+from sklearn.datasets import load_iris
+iris_dataset=load_iris()
+#print("iris_dataset:",iris_dataset)
+print("Keys of iris_datasets:\n{}".format(iris_dataset.keys()))
+print(iris_dataset['DESCR'][:193]+"\n...")
+print("Target names:{}".format(iris_dataset['target_names']))
+print("Feature names:{}".format(iris_dataset['feature_names']))
+print("Types of data:\n{}".format(type(iris_dataset['data'])))
+print("Shapes of data:\n{}".format(iris_dataset['data'].shape))
+print("First five columns of data:\n{}".format(iris_dataset['data'][:5]))
+print("Types of target:\n{}".format(type(iris_dataset['target'])))
+print("Shapes of target:\n{}".format(iris_dataset['target'].shape))
+print("Target:\n{}".format(iris_dataset['target']))
